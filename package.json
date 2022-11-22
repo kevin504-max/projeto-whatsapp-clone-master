@@ -1,0 +1,28 @@
+{
+  "name": "curso-javascript-projeto-whatsapp-clone-master",
+  "version": "1.0.0",
+  "description": "[![Hcode Treinamentos](https://www.hcode.com.br/res/img/hcode-200x100.png)](https://www.hcode.com.br)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack-dev-server --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevin504-max/projeto-whatsapp-clone-master.git"
+  },
+  "author": "Kevin Lucas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kevin504-max/projeto-whatsapp-clone-master/issues"
+  },
+  "homepage": "https://github.com/kevin504-max/projeto-whatsapp-clone-master#readme",
+  "dependencies": {
+    "html-webpack-plugin": "^5.5.0",
+    "start": "^5.1.0",
+    "webpack": "^5.12.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.0"
+  }
+}
