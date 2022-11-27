@@ -13,31 +13,77 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "CameraController": () => (/* binding */ CameraController)
 /* harmony export */ });
 class CameraController {
-    // constructor(videoEl) {
-    //     this._videoEl = videoEl;
-
-    //     navigator.mediaDevices.getUserMedia({
-    //         video: true
-    //     }).then(stream => {
-    //         this._videoEl.src = URL.createObjectURL(stream);
-    //         this._videoEl.play();
-    //     }).catch(err => {
-    //         console.error(err);
-    //     });
-    // }
     constructor(videoEl) {
-        console.log('CameraCOntroller OK');
         this._videoEl = videoEl;
-
         navigator.mediaDevices.getUserMedia({
             video: true
         }).then(stream => {
-            
             this._stream = stream;
             this._videoEl.srcObject = stream;
             this._videoEl.play();
-        }).catch(err => {
-            console.error(err);
+        }).catch(th => {
+            console.error(th);
+        });
+    }
+
+    stop() {
+        this._stream.getTracks().forEach(track => {
+            track.stop();
+        });
+    }
+
+    takePicture(mineType = 'image/png') {
+        let canvas = document.createElement('canvas');~
+        canvas.setAttribute('height', this._videoEl.videoHeight);
+        canvas.setAttribute('width', this._videoEl.videoWidth);
+
+        let context = canvas.getContext('2d');
+        context.drawImage(this._videoEl, 0, 0, canvas.width, canvas.height);
+
+        return canvas.toDataURL(mineType);
+    }
+}
+
+/***/ }),
+
+/***/ "./src/controller/DocumentPreviewController.js":
+/*!*****************************************************!*\
+  !*** ./src/controller/DocumentPreviewController.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DocumentPreviewController": () => (/* binding */ DocumentPreviewController)
+/* harmony export */ });
+class DocumentPreviewController {
+    constructor (file) {
+        this._file = file;
+    }
+
+    getPreviewData() {
+        return new Promisse((s, f) => {
+            switch(this._file.type) {
+                case 'image/png':
+                case 'image/jpeg':
+                case 'image/jpg':
+                case 'image/gif':
+                let reader = new FileReader();
+                reader.onload = e => {
+                    s(reader.result);
+                }
+                reader.onerror = e => {
+                    f(e);
+                }
+                reader.readAsdataURL(file);
+                break;
+
+                case 'application/pdf':
+                break;
+
+                default: 
+                    f();
+            }
         });
     }
 }
@@ -56,7 +102,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _util_Format_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../util/Format.js */ "./src/util/Format.js");
 /* harmony import */ var _CameraController_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CameraController.js */ "./src/controller/CameraController.js");
+/* harmony import */ var _DocumentPreviewController_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DocumentPreviewController.js */ "./src/controller/DocumentPreviewController.js");
 
+  
   
 
 class WhatsappController {
@@ -221,12 +269,33 @@ class WhatsappController {
         });
 
         this.el.btnClosePanelCamera.on('click', e => {
+
             this.closeAllMainPanel();
             this.el.panelMessagesContainer.show();
+            this._camera.stop();
         });
 
         this.el.btnTakePicture.on('click', e => {
-            console.log('taking picture');
+            let dataUrl = this._camera.takePicture();
+            
+            this.el.pictureCamera.src = dataUrl;
+            this.el.pictureCamera.show();
+            this.el.videoCamera.hide();
+            this.el.btnReshootPanelCamera.show();
+            this.el.containerTakePicture.hide();
+            this.el.containerSendPicture.show();
+        });
+
+        this.el.btnReshootPanelCamera.on('click', e => {
+            this.el.pictureCamera.hide();
+            this.el.videoCamera.show();
+            this.el.btnReshootPanelCamera.hide();
+            this.el.containerTakePicture.show();
+            this.el.containerSendPicture.hide();
+        });
+
+        this.el.btnSendPicture.on('click', e => {
+            console.log(this.el.pictureCamera.src);
         });
 
         this.el.btnAttachDocument.on('click', e => {
@@ -235,7 +304,21 @@ class WhatsappController {
             this.el.panelDocumentPreview.css({
                 'height': 'calc(100% - 120px)'
             });
+            this.el.inputDocument.click();
         });
+
+        this.el.inputDocument.on('change', e => {
+            if(this.el.inputDocument.files.length) {
+                let file = this.el.inputDocument.files[0];
+                this._documentPreviewController = new _DocumentPreviewController_js__WEBPACK_IMPORTED_MODULE_2__.DocumentPreviewController(file);
+                this._documentPreviewController.getPreviewData().then(data => {
+                    console.log('ok', data);
+                }).cathc(th => {
+                    console.log('erro', th);
+                });
+            }   
+
+        })
 
         this.el.btnClosePanelDocumentPreview.on('click', e => {
             this.closeAllMainPanel();
