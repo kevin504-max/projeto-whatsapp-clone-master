@@ -4,7 +4,7 @@ export class DocumentPreviewController {
     }
 
     getPreviewData() {
-        return new Promisse((s, f) => {
+        return new Promise((s, f) => {
             switch(this._file.type) {
                 case 'image/png':
                 case 'image/jpeg':
@@ -12,12 +12,15 @@ export class DocumentPreviewController {
                 case 'image/gif':
                 let reader = new FileReader();
                 reader.onload = e => {
-                    s(reader.result);
+                    s({
+                        src: reader.result,
+                        info: this._file.name
+                    });
                 }
                 reader.onerror = e => {
                     f(e);
                 }
-                reader.readAsdataURL(file);
+                reader.readAsDataURL(this._file);
                 break;
 
                 case 'application/pdf':
