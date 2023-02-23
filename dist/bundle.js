@@ -56,6 +56,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "DocumentPreviewController": () => (/* binding */ DocumentPreviewController)
 /* harmony export */ });
+const path = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module 'path'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+
 class DocumentPreviewController {
     constructor (file) {
         this._file = file;
