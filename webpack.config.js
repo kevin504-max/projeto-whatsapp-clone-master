@@ -1,6 +1,5 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
-// set NODE_OPTIONS=--openssl-legacy-provider
 module.exports = {
     mode: 'development',
     entry: {
@@ -8,7 +7,7 @@ module.exports = {
     },
     output: {
         filename: 'bundle.js',
-        path: path.resolve(__dirname, '/dist'),
+        path: path.join(__dirname, '/dist'),
         publicPath: 'dist',
     },
     devtool: 'source-map',
