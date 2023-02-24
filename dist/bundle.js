@@ -112,9 +112,10 @@ class MicrophoneController extends _util_ClassEvent_js__WEBPACK_IMPORTED_MODULE_
         navigator.mediaDevices.getUserMedia({
             audio: true
         }).then(stream => {
+            console.log(stream);
             this._stream = stream;
             let audio = new Audio();
-            audio.src = URL.createObjectURL(stream);
+            audio.srcObject = stream;
             audio.play();
             this.trigger('play', audio);
         }).catch(err => {

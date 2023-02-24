@@ -8,7 +8,7 @@ export class MicrophoneController extends ClassEvent {
         }).then(stream => {
             this._stream = stream;
             let audio = new Audio();
-            audio.src = URL.createObjectURL(stream);
+            audio.srcObject = stream;
             audio.play();
             this.trigger('play', audio);
         }).catch(err => {
