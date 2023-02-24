@@ -93,6 +93,44 @@ class DocumentPreviewController {
 
 /***/ }),
 
+/***/ "./src/controller/MicrophoneController.js":
+/*!************************************************!*\
+  !*** ./src/controller/MicrophoneController.js ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MicrophoneController": () => (/* binding */ MicrophoneController)
+/* harmony export */ });
+/* harmony import */ var _util_ClassEvent_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/ClassEvent.js */ "./src/util/ClassEvent.js");
+
+
+class MicrophoneController extends _util_ClassEvent_js__WEBPACK_IMPORTED_MODULE_0__.ClassEvent {
+    constructor () {
+        super();
+        navigator.mediaDevices.getUserMedia({
+            audio: true
+        }).then(stream => {
+            this._stream = stream;
+            let audio = new Audio();
+            audio.src = URL.createObjectURL(stream);
+            audio.play();
+            this.trigger('play', audio);
+        }).catch(err => {
+            console.error(err);
+        });
+    }
+
+    stop() {
+        this._stream.getTracks().forEach(track => {
+            track.stop();
+        });
+    }
+}
+
+/***/ }),
+
 /***/ "./src/controller/WhatsappController.js":
 /*!**********************************************!*\
   !*** ./src/controller/WhatsappController.js ***!
@@ -105,8 +143,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _util_Format_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../util/Format.js */ "./src/util/Format.js");
 /* harmony import */ var _CameraController_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CameraController.js */ "./src/controller/CameraController.js");
-/* harmony import */ var _DocumentPreviewController_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DocumentPreviewController.js */ "./src/controller/DocumentPreviewController.js");
+/* harmony import */ var _MicrophoneController_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MicrophoneController.js */ "./src/controller/MicrophoneController.js");
+/* harmony import */ var _DocumentPreviewController_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DocumentPreviewController.js */ "./src/controller/DocumentPreviewController.js");
 
+  
   
   
 
@@ -313,7 +353,7 @@ class WhatsappController {
         this.el.inputDocument.on('change', e => {
             if(this.el.inputDocument.files.length) {
                 let file = this.el.inputDocument.files[0];
-                this._documentPreviewController = new _DocumentPreviewController_js__WEBPACK_IMPORTED_MODULE_2__.DocumentPreviewController(file);
+                this._documentPreviewController = new _DocumentPreviewController_js__WEBPACK_IMPORTED_MODULE_3__.DocumentPreviewController(file);
                 this._documentPreviewController.getPreviewData().then(result => {
                     this.el.imgPanelDocumentPreview.src = result.src;
                     this.el.infoPanelDocumentPreview.innerHTML = result.info;
@@ -369,13 +409,20 @@ class WhatsappController {
             this.el.recordMicrophone.show();
             this.el.btnSendMicrophone.hide();
             this.startRecordMicrophoneTime();
+
+            this._microphoneController = new _MicrophoneController_js__WEBPACK_IMPORTED_MODULE_2__.MicrophoneController();
+            this._microphoneController.on('play', musica => {
+                console.log("musica", musica);
+            });
         });
 
         this.el.btnCancelMicrophone.on('click', e => {
-            this.closeRecordMicrophone();
+            this._microphoneController.stop();
+            this.closeRecordMicrophone();   
         });
 
         this.el.btnFinishMicrophone.on('click', e => {
+            this._microphoneController.stop();
             this.closeRecordMicrophone();
         });
 
@@ -468,6 +515,43 @@ class WhatsappController {
     closeAllLeftPanel() {
         this.el.panelAddContact.hide();
         this.el.panelEditProfile.hide();
+    }
+}
+
+/***/ }),
+
+/***/ "./src/util/ClassEvent.js":
+/*!********************************!*\
+  !*** ./src/util/ClassEvent.js ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ClassEvent": () => (/* binding */ ClassEvent)
+/* harmony export */ });
+class ClassEvent {
+    constructor() {
+        this._events = {};
+    }
+
+    on(eventName, fn) {
+        if (!this._events[eventName]) this._events[eventName] = new Array();
+
+        this._events[eventName].push(fn);
+    }
+
+    trigger() {
+        let args = [...arguments];
+        let eventName = args.shift();
+
+        args.push(new Event(eventName));
+
+        if(this._events[eventName] instanceof Array) {
+            this._events[eventName].forEach(fn => {
+                fn.apply(null, args);
+            });
+        }
     }
 }
 
