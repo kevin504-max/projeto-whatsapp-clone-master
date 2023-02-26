@@ -165,6 +165,7 @@ class MicrophoneController extends _util_ClassEvent_js__WEBPACK_IMPORTED_MODULE_
             });
 
             this._mediaRecorder.start();
+            this.startTimer();
         }
     }
 
@@ -173,6 +174,17 @@ class MicrophoneController extends _util_ClassEvent_js__WEBPACK_IMPORTED_MODULE_
             this._mediaRecorder.stop();
             this.stop();
         }
+    }
+
+    startTimer() {
+        let start = Date.now();
+        this._recordMicrophoneInterval = setInterval(() => {
+            this.trigger('recordtimer', (Date.now() - start));
+        }, 100);
+    }
+
+    stopTiemer() {
+        clearInterval(this._recordMicrophoneInterval);
     }
 }
 
@@ -455,13 +467,16 @@ class WhatsappController {
         this.el.btnSendMicrophone.on('click', e => {
             this.el.recordMicrophone.show();
             this.el.btnSendMicrophone.hide();
-            this.startRecordMicrophoneTime();
 
             this._microphoneController = new _MicrophoneController_js__WEBPACK_IMPORTED_MODULE_2__.MicrophoneController();
             this._microphoneController.on('ready', musica => {
                 console.log("ready event");
                 this._microphoneController.startRecorder();
             });
+
+            this._microphoneController.on('recordtimer', timer => {
+                this.el.recordMicrophoneTimer.innerHTML = _util_Format_js__WEBPACK_IMPORTED_MODULE_0__.Format.toTime(timer);
+            })
         });
 
         this.el.btnCancelMicrophone.on('click', e => {
@@ -536,17 +551,9 @@ class WhatsappController {
         });
     }
 
-    startRecordMicrophoneTime() {
-        let start = Date.now();
-        this._recordMicrophoneInterval = setInterval(() => {
-            this.el.recordMicrophoneTimer.innerHTML = _util_Format_js__WEBPACK_IMPORTED_MODULE_0__.Format.toTime(Date.now() - start);
-        }, 100);
-    }
-
     closeRecordMicrophone() {
         this.el.recordMicrophone.hide();
         this.el.btnSendMicrophone.show();
-        clearInterval(this._recordMicrophoneInterval);
     }
 
     closeAllMainPanel() {
